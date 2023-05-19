@@ -17,7 +17,7 @@ import com.thach.englishapp.Speaking.MenuSpeakingActivity;
 import com.thach.englishapp.Vocabulary.MenuVocabularyActivity;
 
 public class MainActivity extends AppCompatActivity {
-
+    CardView cardViewHocTuVung, cardViewTracNghiem, cardViewSapXepCau, cardViewLuyenNghe,cardViewDienKhuyet,cardViewXepHang;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
