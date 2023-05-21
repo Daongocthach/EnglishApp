@@ -22,13 +22,10 @@ import java.util.Locale;
 
 public class ListeningAdapter extends RecyclerView.Adapter<ListeningAdapter.ListenViewHolder> {
     private ArrayList<String> strings;
-    private IClickItem iClickItem;
     private Context context;
     private TextToSpeech tts;
-    ListeningActivity listeningActivity = new ListeningActivity();
     public ListeningAdapter(ArrayList<String> strings, Context context, TextToSpeech tts) {
         this.strings = strings;
-        this.iClickItem = iClickItem;
         this.context = context;
         this.tts = tts;
     }
@@ -41,12 +38,6 @@ public class ListeningAdapter extends RecyclerView.Adapter<ListeningAdapter.List
     @Override
     public void onBindViewHolder(@NonNull ListenViewHolder holder, @SuppressLint("RecyclerView") int position) {
         String string = strings.get(position);
-
-        if(string==null){
-            return;
-        }
-
-
         holder.text.setText(string);
         holder.listen.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -2,23 +2,19 @@ package com.thach.englishapp.Listening;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.thach.englishapp.Adapter.ListeningAdapter;
 import com.thach.englishapp.Model.Topic;
 import com.thach.englishapp.R;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Locale;
 
 public class ListeningActivity extends AppCompatActivity {
@@ -38,6 +34,7 @@ public class ListeningActivity extends AppCompatActivity {
         ImageView imageView = findViewById(R.id.image);
         ImageView imageViewplay = findViewById(R.id.imageView_play);
         TextView name = findViewById(R.id.title);
+        //TextView showtext = findViewById(R.id.showtext);
         tts = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
@@ -55,7 +52,9 @@ public class ListeningActivity extends AppCompatActivity {
             } else return;
         }
         string = topic.getText();
-        ArrayList<String> arrayList = splitParagraph(string);
+
+        ArrayList<String> arrayList = splitIntoParagraphs(string, 30);
+        //showtext.setText();
         listeningAdapter = new ListeningAdapter(arrayList, ListeningActivity.this, tts);
         recyclerView = findViewById(R.id.listen_recycleview);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
@@ -78,21 +77,25 @@ public class ListeningActivity extends AppCompatActivity {
         });
     }
 
-    private ArrayList<String> splitParagraph(String paragraph) {
-        // Tách đoạn văn thành các từ riêng lẻ
-        String[] words = paragraph.split(".");
-        int numParts = (int) Math.ceil((double) words.length / 20);
-        for (int i = 0; i < numParts; i++) {
-            int startIndex = i * 20;
-            int endIndex = Math.min(startIndex + 20, words.length);
-            StringBuilder builder = new StringBuilder();
+    private ArrayList<String> splitIntoParagraphs(String text, int wordsPerParagraph) {
+        ArrayList<String> paragraphs = new ArrayList<>();
+        String[] words = text.split("\\s");
+        int totalWords = words.length;
+        int totalParagraphs = (int) Math.ceil((double) totalWords / wordsPerParagraph);
+        for (int i = 0; i < totalParagraphs; i++) {
+            StringBuilder paragraph = new StringBuilder();
+
+            int startIndex = i * wordsPerParagraph;
+            int endIndex = Math.min(startIndex + wordsPerParagraph, totalWords);
+
             for (int j = startIndex; j < endIndex; j++) {
-                builder.append(words[j]).append(" ");
+                paragraph.append(words[j]).append(" ");
             }
-            words[i] = builder.toString().trim();
+
+            paragraphs.add(paragraph.toString().trim());
         }
-        ArrayList<String> stringList = new ArrayList<>(Arrays.asList(words));
-        return stringList;
+
+        return paragraphs;
     }
 
     @Override
