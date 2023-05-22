@@ -55,6 +55,7 @@
 
 
     <LinearLayout
+        android:layout_below="@id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
@@ -152,11 +153,12 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    android:id="@+id/imageView11"
+                    android:id="@+id/image_translate"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:gravity="center"
+                    android:scaleType="fitCenter"
                     android:text="1.0x"
                     android:textAlignment="center"
                     android:textColor="@color/black"
@@ -187,7 +189,7 @@
                     app:srcCompat="@drawable/forward" />
 
                 <ImageView
-                    android:id="@+id/imageView10"
+                    android:id="@+id/image_repeate"
                     android:layout_width="match_parent"
                     android:layout_height="30dp"
                     android:layout_gravity="center"

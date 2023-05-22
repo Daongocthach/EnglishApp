@@ -3,38 +3,50 @@ package com.thach.englishapp.Adapter;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.speech.tts.TextToSpeech;
-import android.util.Log;
+import android.text.method.TransformationMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import com.thach.englishapp.Listening.ListeningActivity;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.thach.englishapp.Interface.IClickItem;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.mlkit.common.model.DownloadConditions;
+import com.google.mlkit.nl.translate.TranslateLanguage;
+import com.google.mlkit.nl.translate.Translation;
+import com.google.mlkit.nl.translate.Translator;
+import com.google.mlkit.nl.translate.TranslatorOptions;
 import com.thach.englishapp.R;
 
 import java.util.ArrayList;
-import java.util.Locale;
 
 public class ListeningAdapter extends RecyclerView.Adapter<ListeningAdapter.ListenViewHolder> {
     private ArrayList<String> strings;
     private Context context;
     private TextToSpeech tts;
+    private Translator translatorVietnam;
+    private Boolean isTranslated = false;
+
     public ListeningAdapter(ArrayList<String> strings, Context context, TextToSpeech tts) {
         this.strings = strings;
         this.context = context;
         this.tts = tts;
     }
+
+
     @NonNull
     @Override
     public ListenViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.listening_item, parent,false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.listening_item, parent, false);
+        Translate();
         return new ListenViewHolder(view);
     }
+
     @Override
     public void onBindViewHolder(@NonNull ListenViewHolder holder, @SuppressLint("RecyclerView") int position) {
         String string = strings.get(position);
@@ -45,19 +57,46 @@ public class ListeningAdapter extends RecyclerView.Adapter<ListeningAdapter.List
                 tts.speak(string, TextToSpeech.QUEUE_FLUSH, null);
             }
         });
+        holder.dich.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!isTranslated) {
+                    translatorVietnam.translate(string)
+                            .addOnSuccessListener(new OnSuccessListener<String>() {
+                                @Override
+                                public void onSuccess(String s) {
+                                    holder.text.setText(s);
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    holder.text.setText(e.toString());
+                                }
+                            });
+                    isTranslated = true;
+                }else {
+                    holder.text.setText(string);
+                    isTranslated = false;
+                }
+            }
+        });
     }
+
     @Override
     public int getItemCount() {
-        if(strings!=null){
+        if (strings != null) {
             return strings.size();
         }
         return 0;
     }
-    public class ListenViewHolder extends RecyclerView.ViewHolder{
+
+    public class ListenViewHolder extends RecyclerView.ViewHolder {
         private LinearLayout listenLayout;
         private TextView text;
         private ImageView dich;
         private ImageView listen;
+
         public ListenViewHolder(@NonNull View itemView) {
             super(itemView);
             listenLayout = itemView.findViewById(R.id.listen_item);
@@ -67,4 +106,17 @@ public class ListeningAdapter extends RecyclerView.Adapter<ListeningAdapter.List
         }
     }
 
+    public void Translate() {
+        TranslatorOptions options =
+                new TranslatorOptions.Builder()
+                        .setSourceLanguage(TranslateLanguage.ENGLISH)
+                        .setTargetLanguage(TranslateLanguage.VIETNAMESE)
+                        .build();
+
+        translatorVietnam = Translation.getClient(options);
+        DownloadConditions conditions = new DownloadConditions.Builder()
+                .requireWifi()
+                .build();
+        translatorVietnam.downloadModelIfNeeded(conditions);
+    }
 }
